@@ -1,36 +1,78 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+[![OTPless](https://d1j61bbz9a40n6.cloudfront.net/website/home/v4/logo/white_logo.svg)](https://otpless.com/)
 
-## Getting Started
+# NextJS Demo: Otpless Login Page
 
-First, run the development server:
+## Steps to add OTPless SDK to your NextJS Website
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. **Create an App in [OTPless dashboard](https://otpless.com/dashboard/customer/dev-settings) and copy the `APP ID`**
+2. **Add the function to append *OTPless Script* to document *head***
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+    > Add the following code to your utils/initOtpless.js in root directory.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+    ```js
+    export const initOTPless = (callback: Function) => {
+        Reflect.set(window, 'otpless', callback)
+        const isScriptLoaded = document.getElementById('otpless-sdk')
+        if (isScriptLoaded) return
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+        const otplessSDK: HTMLScriptElement = document.createElement('script')
+        otplessSDK.id = 'otpless-sdk'
+        otplessSDK.type = 'text/javascript'
+        otplessSDK.src = 'https://otpless.com/v2/auth.js'
+        otplessSDK.setAttribute('data-appid', 'PASTE_YOUR_APPID_HERE')
 
-## Learn More
+        document.head.appendChild(otplessSDK)
+    }
+    ```
 
-To learn more about Next.js, take a look at the following resources:
+    > [view source](./src/utils/initOtpless.ts#L1)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. **Load the script in Login/Signup component and add callback function**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+    > Add following code in Login/Signup component.
+    >> retrive data using **otplessUser** object
 
-## Deploy on Vercel
+    ```jsx
+    useEffect(() => initOTPless(callback), []);
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+    const callback = (otplessUser: Object): void => {
+        // Replace the following code with your own logic
+        console.log(otplessUser)
+        alert(JSON.stringify(otplessUser))
+    }
+    ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+    > [view source](./src/app/page.tsx#L7)
+
+4. **Add OTPless Auth modal**
+
+    > Add the following div#otpless-login-page in Login/Signup component.
+
+    ```html
+    <div id="otpless-login-page"></div>
+    ```
+
+### This demo implementation adds extra modularity, scalability and reusability to the otpless-auth sdk
+
+### Usage
+
+> **Prerequisites**: [NodeJS](https://nodejs.org/en)
+
+- Install Packages
+
+    ```bash
+    npm install
+    ```
+
+- Run the demo
+
+    ```bash
+    npm run dev
+    ```
+
+- Open [localhost:3000](http://localhost:3000) in your browser
+- Switch branches to check out available options to integrate *OTPless* in your project
+
+## *Thank You*
+
+## [Visit OTPless](https://otpless.com/docs/frontend-sdks/web-sdks/react/pre-built-ui)
