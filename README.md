@@ -1,58 +1,66 @@
 [![OTPless](https://d1j61bbz9a40n6.cloudfront.net/website/home/v4/logo/white_logo.svg)](https://otpless.com/)
 
-# NextJS Demo: Otpless Login Page
+# Next-JS Demo: Otpless Headless SDK
 
-## Steps to add OTPless SDK to your NextJS Website
+## Steps to add OTPless Headless SDK to your NextJS Website
 
 1. **Create an App in [OTPless dashboard](https://otpless.com/dashboard/customer/dev-settings) and copy the `APP ID`**
-2. **Add the function to append *OTPless Script* to document *head***
+2. **Add the function to append OTPless Script to document head**
 
-    > Add the following code to your utils/initOtpless.js in root directory.
+    > Add the contents of [initOtpless.js](./src/utils/initOtpless.ts) file in `src/utils/initOtpless.js` file in your project and *paste* the `APP ID` [here](./src/utils/initOtpless.ts#L17).
 
-    ```js
-    export const initOTPless = (callback: Function) => {
-        Reflect.set(window, 'otpless', callback)
-        const isScriptLoaded = document.getElementById('otpless-sdk')
-        if (isScriptLoaded) return
+    **initOtpless.js file exports the following functions**
 
-        const otplessSDK: HTMLScriptElement = document.createElement('script')
-        otplessSDK.id = 'otpless-sdk'
-        otplessSDK.type = 'text/javascript'
-        otplessSDK.src = 'https://otpless.com/v2/auth.js'
-        otplessSDK.setAttribute('data-appid', 'PASTE_YOUR_APPID_HERE')
+    >> ***[initOTPless](./src/utils/initOtpless.ts#L9)***, to initialize the OTPless SDK,
 
-        document.head.appendChild(otplessSDK)
-    }
-    ```
+    >> ***[Authenticate](./src/utils/initOtpless.ts#L37)***, to authenticate the user.
 
-    > [view source](./src/utils/initOtpless.ts#L1)
+    >> ***[verifyOTP](./src/utils/initOtpless.ts#L89)***, to verify the OTP.
+
+
 
 3. **Load the script in Login/Signup component and add callback function**
 
     > Add following code in Login/Signup component.
     >> retrive data using **otplessUser** object
 
-    ```jsx
-    useEffect(() => initOTPless(callback), []);
+    ```tsx
+    useEffect(() => initOTPless(callback), [])
 
     const callback = (otplessUser: Object): void => {
-        // Replace the following code with your own logic
-        console.log(otplessUser)
-        alert(JSON.stringify(otplessUser))
-    }
+		// Replace the following code with your own logic
+		console.log(otplessUser)
+		alert(JSON.stringify(otplessUser))
+	}
     ```
 
-    > [view source](./src/app/page.tsx#L7)
+    [view source](./src/app/page.tsx#L12)
 
-4. **Add OTPless Auth modal**
+4. **Create your UI**
 
-    > Add the following div#otpless-login-page in Login/Signup component.
+    > Design UI to collect user input and trigger authentication method of your choice.
 
-    ```html
-    <div id="otpless-login-page"></div>
+    ```jsx
+    const [phone, setPhone] = useState(null)
+	const [otp, setOtp] = useState(null)
+    return <>
+        <div id="mobile-section">
+            <input id='mobile-input' placeholder='Enter mobile number' onChange={(e) => setPhone(e.target.value)} />
+            <button onClick={() => Authenticate({ channel: 'PHONE', phone })}>Request OTP</button>
+        </div>
+
+        <div id="otp-section">
+            <input id='otp-input' placeholder='Enter OTP' onChange={(e) => setOtp(e.target.value)} minLength={6} maxLength={6} />
+            <button onClick={() => verifyOTP({ channel: activeSection, otp, phone })}>Verify OTP</button>
+        </div>
+
+        <button onClick={() => Authenticate({channel: 'OAUTH', channelType:'WHATSAPP' })}>Authenticate with WhatsApp</button>
+        <button onClick={() => Authenticate({channel: 'OAUTH', channelType:'GOOGLE'})}>Authenticate with Gmail</button>
+    </>
     ```
+    [view source](./src/app/page.tsx#L37)  (NOTE: This integration has a different ui)
 
-### This demo implementation adds extra modularity, scalability and reusability to the otpless-auth sdk
+### This demo implementation adds extra modularity, scalability and reusability to the OTPless Headless sdk
 
 ### Usage
 
@@ -73,6 +81,8 @@
 - Open [localhost:3000](http://localhost:3000) in your browser
 - Switch branches to check out available options to integrate *OTPless* in your project
 
+### ***Note: Enable your choosen Authentication Method from [OTPless dashboard](https://otpless.com/dashboard/customer/channels) before using it.***
+
 ## *Thank You*
 
-## [Visit OTPless](https://otpless.com/docs/frontend-sdks/web-sdks/react/pre-built-ui)
+## [Visit OTPless](https://otpless.com/platforms/react)
